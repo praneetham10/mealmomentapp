@@ -1,12 +1,11 @@
 import os
 from openai import OpenAI
 
-# Get API key from environment (Streamlit Secrets)
+# Get API key securely
 api_key = os.getenv("OPENAI_API_KEY")
 
-# Optional safety check
 if not api_key:
-    raise ValueError("OPENAI_API_KEY is not set. Please add it in Streamlit Secrets.")
+    raise ValueError("OPENAI_API_KEY not set in environment.")
 
 client = OpenAI(api_key=api_key)
 

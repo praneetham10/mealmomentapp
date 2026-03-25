@@ -1,20 +1,24 @@
 from agents.recipe_agent import get_recipe_data
-from agents.mapping_agent import map_ingredients_to_products
-from agents.cart_agent import build_cart
-
 
 def generate_cart(dish):
+    recipe_data = get_recipe_data(dish)
 
-    recipe = get_recipe_data(dish)
+    ingredients = recipe_data.get("ingredients", [])
+    steps = recipe_data.get("steps", [])
 
-    ingredients = recipe.get("ingredients", [])
-    steps = recipe.get("steps", [])
+    # SIMPLE CART LOGIC (no mapper needed)
+    cart = []
 
-    mapped = map_ingredients_to_products(ingredients)
-    cart = build_cart(mapped)
+    for item in ingredients:
+        cart.append({
+            "ingredient": item.get("name", ""),
+            "product": item.get("name", ""),  # basic mapping
+            "price": 50,  # dummy price
+            "quantity": item.get("quantity", "")
+        })
 
     return {
         "ingredients": ingredients,
-        "cart": cart,
-        "steps": steps
+        "steps": steps,
+        "cart": cart
     }

@@ -1,10 +1,14 @@
 import os
 from openai import OpenAI
-from dotenv import load_dotenv
 
-load_dotenv()
+# Get API key from environment (Streamlit Secrets)
+api_key = os.getenv("OPENAI_API_KEY")
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Optional safety check
+if not api_key:
+    raise ValueError("OPENAI_API_KEY is not set. Please add it in Streamlit Secrets.")
+
+client = OpenAI(api_key=api_key)
 
 def get_completion(prompt):
     response = client.chat.completions.create(

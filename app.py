@@ -104,35 +104,36 @@ if st.session_state.result:
     total = 0
     selected_items = []
 
-    cols = st.columns(3)
+    # ✅ FIXED GRID (NO EMPTY BOXES)
+    for i in range(0, len(available), 3):
+        row_items = available[i:i+3]
+        cols = st.columns(len(row_items))
 
-    for i, item in enumerate(available):
-        with cols[i % 3]:
+        for col, item in zip(cols, row_items):
+            with col:
 
-            st.markdown("""
-            <div style="padding:15px; border-radius:15px; background:#ffffff; box-shadow:0px 2px 8px rgba(0,0,0,0.1); text-align:center;">
-            """, unsafe_allow_html=True)
+                st.markdown("""
+                <div style="padding:15px; border-radius:15px; background:#ffffff; box-shadow:0px 2px 8px rgba(0,0,0,0.1); text-align:center;">
+                """, unsafe_allow_html=True)
 
-            # ✅ LOCAL IMAGE (FIXED)
-            image_path = get_image_path(item["product"])
-            st.image(image_path, width=100)
+                image_path = get_image_path(item["product"])
+                st.image(image_path, width=100)
 
-            st.markdown(f"**{item['product']}**")
-            st.caption(item["quantity"])
-            st.markdown(f"💰 ₹{item['price']}")
+                st.markdown(f"**{item['product']}**")
+                st.caption(item["quantity"])
+                st.markdown(f"💰 ₹{item['price']}")
 
-            # ✅ CHECKBOX (UNCHANGED)
-            checked = st.checkbox(
-                "Add",
-                value=True,
-                key=f"cart_{i}"
-            )
+                checked = st.checkbox(
+                    "Add",
+                    value=True,
+                    key=f"cart_{i}_{item['product']}"
+                )
 
-            if checked:
-                total += item["price"]
-                selected_items.append(item)
+                if checked:
+                    total += item["price"]
+                    selected_items.append(item)
 
-            st.markdown("</div>", unsafe_allow_html=True)
+                st.markdown("</div>", unsafe_allow_html=True)
 
     # ---------------- UNAVAILABLE ----------------
     if unavailable:

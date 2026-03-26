@@ -21,6 +21,9 @@ def get_image_path(product_name):
         "chili": "assets/chili.png",
         "turmeric": "assets/turmeric.png",
         "cashew": "assets/cashew.png",
+        "rice": "assets/default.png",
+        "chicken": "assets/default.png",
+        "yogurt": "assets/default.png"
     }
 
     for key in mapping:
@@ -29,18 +32,22 @@ def get_image_path(product_name):
 
     return "assets/default.png"
 
+
 # ---------------- SAFE IMAGE ----------------
 def show_image(path):
     if os.path.exists(path):
-        st.image(path, width=80)
+        st.image(path, width=70)
     else:
-        st.image("https://via.placeholder.com/80", width=80)
+        st.image("https://via.placeholder.com/70", width=70)
+
 
 # ---------------- HEADER ----------------
-st.title("🍳 Meal Moment")
-st.caption("Cook smarter. Shop instantly.")
+st.markdown("""
+<h1 style='text-align: center;'>🍳 Meal Moment</h1>
+<p style='text-align: center; color: grey;'>Cook smarter. Shop instantly.</p>
+""", unsafe_allow_html=True)
 
-dish = st.text_input("🔍 What do you want to cook?")
+dish = st.text_input("🔍 What do you want to cook?", key="dish_input")
 
 if "result" not in st.session_state:
     st.session_state.result = None
@@ -48,50 +55,54 @@ if "result" not in st.session_state:
 if "last_dish" not in st.session_state:
     st.session_state.last_dish = None
 
-if dish and (st.session_state.last_dish != dish or st.button("Generate Cart")):
+if dish and (
+    st.session_state.last_dish != dish
+    or st.button("Generate Cart")
+):
     st.session_state.last_dish = dish
     st.session_state.result = generate_cart(dish)
+
 
 # ---------------- MAIN ----------------
 if st.session_state.result:
 
     result = st.session_state.result
 
-    # ---------- INGREDIENTS + STEPS ----------
+    # ---------------- INGREDIENTS + STEPS ----------------
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("🥘 Ingredients")
+        st.markdown("## 🥘 Ingredients")
         for item in result["ingredients"]:
-            st.write(f"**{item['name']}**")
-            st.caption(item["quantity"])
-            st.divider()
+            st.container()
+            st.markdown(f"""
+            <div style="padding:10px; border-radius:8px; background:#f5f5f5; margin-bottom:8px;">
+                <b>{item['name']}</b><br>
+                <span style="color:grey;">{item['quantity']}</span>
+            </div>
+            """, unsafe_allow_html=True)
 
     with col2:
-        st.subheader("👨‍🍳 Cooking Steps")
+        st.markdown("## 👨‍🍳 Cooking Steps")
         for i, step in enumerate(result["steps"], 1):
-            st.write(f"**Step {i}**")
-            st.write(step)
-            st.divider()
+            st.markdown(f"""
+            <div style="padding:10px; border-radius:8px; background:#f9f9f9; margin-bottom:8px;">
+                <b>Step {i}</b><br>{step}
+            </div>
+            """, unsafe_allow_html=True)
 
-    st.divider()
+    st.markdown("---")
 
-    # ---------- CART ----------
-    st.subheader("🛒 Your Cart")
+    # ---------------- CART ----------------
+    st.markdown("## 🛒 Your Cart")
 
-    available = []
-    unavailable = []
-
-    for item in result["cart"]:
-        if item["product"] != "❌ Not available":
-            available.append(item)
-        else:
-            unavailable.append(item)
+    available = [i for i in result["cart"] if i["product"] != "❌ Not available"]
+    unavailable = [i for i in result["cart"] if i["product"] == "❌ Not available"]
 
     total = 0
     selected_items = []
 
-    # ✅ CLEAN GRID (NO HTML)
+    # ✅ PERFECT GRID (CONSISTENT)
     for i in range(0, len(available), 3):
         row = available[i:i+3]
         cols = st.columns(3)
@@ -99,38 +110,49 @@ if st.session_state.result:
         for j, item in enumerate(row):
             with cols[j]:
 
-                show_image(get_image_path(item["product"]))
+                with st.container():
 
-                st.write(f"**{item['product']}**")
-                st.caption(item["quantity"])
-                st.write(f"💰 ₹{item['price']}")
+                    st.markdown(
+                        """
+                        <div style="padding:12px; border-radius:12px; background:#f5f5f5;">
+                        """,
+                        unsafe_allow_html=True
+                    )
 
-                checked = st.checkbox(
-                    "Add",
-                    value=True,
-                    key=f"cart_{i}_{j}"
-                )
+                    show_image(get_image_path(item["product"]))
 
-                if checked:
-                    total += item["price"]
-                    selected_items.append(item)
+                    st.markdown(f"**{item['product']}**")
+                    st.caption(item["quantity"])
+                    st.markdown(f"💰 ₹{item['price']}")
 
-    # ---------- UNAVAILABLE ----------
+                    checked = st.checkbox(
+                        "Add",
+                        value=True,
+                        key=f"cart_{i}_{j}"
+                    )
+
+                    if checked:
+                        total += item["price"]
+                        selected_items.append(item)
+
+                    st.markdown("</div>", unsafe_allow_html=True)
+
+    # ---------------- UNAVAILABLE ----------------
     if unavailable:
-        st.warning("Some items not available")
+        st.markdown("### ⚠️ Not Available")
         for item in unavailable:
             st.write(f"- {item['ingredient']}")
 
-    st.divider()
+    st.markdown("---")
 
-    # ---------- SUMMARY ----------
+    # ---------------- SUMMARY ----------------
     col1, col2 = st.columns([2, 1])
 
     with col1:
-        st.subheader("🧾 Selected Items")
+        st.markdown("### 🧾 Selected Items")
         for item in selected_items:
             st.write(f"✔ {item['product']}")
 
     with col2:
-        st.subheader("💳 Total")
-        st.success(f"₹ {total}")
+        st.markdown("### 💳 Total")
+        st.markdown(f"<h2 style='color:green;'>₹ {total}</h2>", unsafe_allow_html=True)

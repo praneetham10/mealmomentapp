@@ -1,5 +1,6 @@
 import streamlit as st
 from core.orchestrator import generate_cart
+import os
 
 st.set_page_config(page_title="Meal Moment", layout="wide")
 
@@ -44,6 +45,7 @@ if "result" not in st.session_state:
 if "last_dish" not in st.session_state:
     st.session_state.last_dish = None
 
+# Trigger
 if dish and (
     st.session_state.last_dish != dish
     or st.button("Generate Cart")
@@ -51,7 +53,7 @@ if dish and (
     st.session_state.last_dish = dish
     st.session_state.result = generate_cart(dish)
 
-# ---------------- MAIN ----------------
+# ---------------- MAIN OUTPUT ----------------
 if st.session_state.result:
 
     result = st.session_state.result
@@ -59,25 +61,31 @@ if st.session_state.result:
     # ================= SIDE BY SIDE =================
     left_col, right_col = st.columns(2)
 
-    # -------- INGREDIENTS --------
+    # ---------------- INGREDIENTS ----------------
     with left_col:
         st.markdown("## 🥘 Ingredients")
 
         cols = st.columns(2)
         for i, item in enumerate(result["ingredients"]):
             with cols[i % 2]:
-                st.write(f"**{item['name']}**")
-                st.caption(item["quantity"])
-                st.markdown("---")
+                st.markdown(f"""
+                <div style="padding:10px; border-radius:10px; background:#f5f5f5; margin-bottom:10px;">
+                    <b>{item['name']}</b><br>
+                    <span style="color:grey;">{item['quantity']}</span>
+                </div>
+                """, unsafe_allow_html=True)
 
-    # -------- RECIPE --------
+    # ---------------- RECIPE ----------------
     with right_col:
         st.markdown("## 👨‍🍳 Cooking Steps")
 
         for i, step in enumerate(result["steps"], 1):
-            st.write(f"**Step {i}**")
-            st.write(step)
-            st.markdown("---")
+            st.markdown(f"""
+            <div style="padding:12px; border-radius:10px; background:#f9f9f9; margin-bottom:10px;">
+                <b>Step {i}</b><br>
+                {step}
+            </div>
+            """, unsafe_allow_html=True)
 
     st.markdown("---")
 
@@ -96,19 +104,24 @@ if st.session_state.result:
     total = 0
     selected_items = []
 
-    # ✅ PERFECT GRID (NO EMPTY BOXES)
+    # ✅ FIXED GRID (NO EMPTY BOXES)
     for i in range(0, len(available), 3):
         row_items = available[i:i+3]
-        cols = st.columns(len(row_items))  # dynamic columns
+        cols = st.columns(len(row_items))
 
         for col, item in zip(cols, row_items):
             with col:
+
+                st.markdown("""
+                <div style="padding:15px; border-radius:15px; background:#ffffff; box-shadow:0px 2px 8px rgba(0,0,0,0.1); text-align:center;">
+                """, unsafe_allow_html=True)
+
                 image_path = get_image_path(item["product"])
                 st.image(image_path, width=100)
 
-                st.write(f"**{item['product']}**")
+                st.markdown(f"**{item['product']}**")
                 st.caption(item["quantity"])
-                st.write(f"💰 ₹{item['price']}")
+                st.markdown(f"💰 ₹{item['price']}")
 
                 checked = st.checkbox(
                     "Add",
@@ -120,7 +133,9 @@ if st.session_state.result:
                     total += item["price"]
                     selected_items.append(item)
 
-    # -------- UNAVAILABLE --------
+                st.markdown("</div>", unsafe_allow_html=True)
+
+    # ---------------- UNAVAILABLE ----------------
     if unavailable:
         st.markdown("### ⚠️ Not Available")
         for item in unavailable:
@@ -128,7 +143,7 @@ if st.session_state.result:
 
     st.markdown("---")
 
-    # -------- SUMMARY --------
+    # ---------------- SUMMARY ----------------
     col1, col2 = st.columns([2, 1])
 
     with col1:
@@ -139,3 +154,5 @@ if st.session_state.result:
     with col2:
         st.markdown("### 💳 Total")
         st.markdown(f"<h2 style='color:green;'>₹ {total}</h2>", unsafe_allow_html=True)
+
+    st.markdown("---")

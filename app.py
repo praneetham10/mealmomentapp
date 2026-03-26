@@ -8,38 +8,28 @@ st.set_page_config(page_title="Meal Moment", layout="wide")
 def get_image_path(product_name):
     name = product_name.lower()
 
-    mapping = {
-        "onion": "assets/onion.png",
-        "tomato": "assets/tomato.png",
-        "paneer": "assets/paneer.png",
-        "butter": "assets/butter.png",
-        "milk": "assets/milk.png",
-        "cream": "assets/milk.png",
-        "oil": "assets/oil.png",
-        "spice": "assets/spices.png",
-        "masala": "assets/spices.png",
-        "chili": "assets/chili.png",
-        "turmeric": "assets/turmeric.png",
-        "cashew": "assets/cashew.png",
-        "rice": "assets/default.png",
-        "chicken": "assets/default.png",
-        "yogurt": "assets/default.png"
-    }
-
-    for key in mapping:
-        if key in name:
-            return mapping[key]
-
-    return "assets/default.png"
-
-
-# ---------------- SAFE IMAGE ----------------
-def show_image(path):
-    if os.path.exists(path):
-        st.image(path, width=70)
+    if "onion" in name:
+        return "assets/onion.png"
+    elif "tomato" in name:
+        return "assets/tomato.png"
+    elif "paneer" in name:
+        return "assets/paneer.png"
+    elif "butter" in name:
+        return "assets/butter.png"
+    elif "milk" in name or "cream" in name:
+        return "assets/milk.png"
+    elif "oil" in name:
+        return "assets/oil.png"
+    elif "spice" in name or "masala" in name:
+        return "assets/spices.png"
+    elif "chili" in name:
+        return "assets/chili.png"
+    elif "turmeric" in name:
+        return "assets/turmeric.png"
+    elif "cashew" in name:
+        return "assets/cashew.png"
     else:
-        st.image("https://via.placeholder.com/70", width=70)
-
+        return "assets/default.png"
 
 # ---------------- HEADER ----------------
 st.markdown("""
@@ -55,6 +45,7 @@ if "result" not in st.session_state:
 if "last_dish" not in st.session_state:
     st.session_state.last_dish = None
 
+# Trigger
 if dish and (
     st.session_state.last_dish != dish
     or st.button("Generate Cart")
@@ -62,80 +53,87 @@ if dish and (
     st.session_state.last_dish = dish
     st.session_state.result = generate_cart(dish)
 
-
-# ---------------- MAIN ----------------
+# ---------------- MAIN OUTPUT ----------------
 if st.session_state.result:
 
     result = st.session_state.result
 
-    # ---------------- INGREDIENTS + STEPS ----------------
-    col1, col2 = st.columns(2)
+    # ================= SIDE BY SIDE =================
+    left_col, right_col = st.columns(2)
 
-    with col1:
+    # ---------------- INGREDIENTS ----------------
+    with left_col:
         st.markdown("## 🥘 Ingredients")
-        for item in result["ingredients"]:
-            st.container()
-            st.markdown(f"""
-            <div style="padding:10px; border-radius:8px; background:#f5f5f5; margin-bottom:8px;">
-                <b>{item['name']}</b><br>
-                <span style="color:grey;">{item['quantity']}</span>
-            </div>
-            """, unsafe_allow_html=True)
 
-    with col2:
+        cols = st.columns(2)
+        for i, item in enumerate(result["ingredients"]):
+            with cols[i % 2]:
+                st.markdown(f"""
+                <div style="padding:10px; border-radius:10px; background:#f5f5f5; margin-bottom:10px;">
+                    <b>{item['name']}</b><br>
+                    <span style="color:grey;">{item['quantity']}</span>
+                </div>
+                """, unsafe_allow_html=True)
+
+    # ---------------- RECIPE ----------------
+    with right_col:
         st.markdown("## 👨‍🍳 Cooking Steps")
+
         for i, step in enumerate(result["steps"], 1):
             st.markdown(f"""
-            <div style="padding:10px; border-radius:8px; background:#f9f9f9; margin-bottom:8px;">
-                <b>Step {i}</b><br>{step}
+            <div style="padding:12px; border-radius:10px; background:#f9f9f9; margin-bottom:10px;">
+                <b>Step {i}</b><br>
+                {step}
             </div>
             """, unsafe_allow_html=True)
 
     st.markdown("---")
 
-    # ---------------- CART ----------------
+    # ================= CART =================
     st.markdown("## 🛒 Your Cart")
 
-    available = [i for i in result["cart"] if i["product"] != "❌ Not available"]
-    unavailable = [i for i in result["cart"] if i["product"] == "❌ Not available"]
+    available = []
+    unavailable = []
+
+    for item in result["cart"]:
+        if item["product"] != "❌ Not available":
+            available.append(item)
+        else:
+            unavailable.append(item)
 
     total = 0
     selected_items = []
 
-    # ✅ PERFECT GRID (CONSISTENT)
+    # ✅ FIXED GRID (NO EMPTY BOXES)
     for i in range(0, len(available), 3):
-        row = available[i:i+3]
-        cols = st.columns(3)
+        row_items = available[i:i+3]
+        cols = st.columns(len(row_items))
 
-        for j, item in enumerate(row):
-            with cols[j]:
+        for col, item in zip(cols, row_items):
+            with col:
 
-                with st.container():
+                st.markdown("""
+                <div style="padding:15px; border-radius:15px; background:#ffffff; box-shadow:0px 2px 8px rgba(0,0,0,0.1); text-align:center;">
+                """, unsafe_allow_html=True)
 
-                    st.markdown(
-                        """
-                        <div style="padding:12px; border-radius:12px; background:#f5f5f5;">
-                        """,
-                        unsafe_allow_html=True
-                    )
+                image_path = get_image_path(item["product"])
+                st.image(image_path, width=100)
 
-                    show_image(get_image_path(item["product"]))
+                st.markdown(f"**{item['product']}**")
+                st.caption(item["quantity"])
+                st.markdown(f"💰 ₹{item['price']}")
 
-                    st.markdown(f"**{item['product']}**")
-                    st.caption(item["quantity"])
-                    st.markdown(f"💰 ₹{item['price']}")
+                checked = st.checkbox(
+                    "Add",
+                    value=True,
+                    key=f"cart_{i}_{item['product']}"
+                )
 
-                    checked = st.checkbox(
-                        "Add",
-                        value=True,
-                        key=f"cart_{i}_{j}"
-                    )
+                if checked:
+                    total += item["price"]
+                    selected_items.append(item)
 
-                    if checked:
-                        total += item["price"]
-                        selected_items.append(item)
-
-                    st.markdown("</div>", unsafe_allow_html=True)
+                st.markdown("</div>", unsafe_allow_html=True)
 
     # ---------------- UNAVAILABLE ----------------
     if unavailable:
@@ -156,3 +154,5 @@ if st.session_state.result:
     with col2:
         st.markdown("### 💳 Total")
         st.markdown(f"<h2 style='color:green;'>₹ {total}</h2>", unsafe_allow_html=True)
+
+    st.markdown("---")

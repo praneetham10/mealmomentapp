@@ -1,18 +1,24 @@
 import os
 from openai import OpenAI
 
-api_key = os.getenv("OPENAI_API_KEY")
-
-if not api_key:
-    raise ValueError("OPENAI_API_KEY not set")
-
-client = OpenAI(api_key=api_key)
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def get_completion(prompt):
     response = client.chat.completions.create(
         model="gpt-4.1-mini",
         messages=[
-            {"role": "system", "content": "You are a helpful cooking assistant."},
+            {
+                "role": "system",
+                "content": """You are a cooking assistant.
+Always respond ONLY in valid JSON format.
+
+Format:
+{
+  "ingredients": [{"name": "", "quantity": ""}],
+  "steps": ["step1", "step2"]
+}
+"""
+            },
             {"role": "user", "content": prompt}
         ],
         temperature=0.3

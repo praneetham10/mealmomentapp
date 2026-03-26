@@ -103,17 +103,25 @@ if st.session_state.result:
     total = 0
     selected_items = []
 
-    # ✅ CART AS CLEAN CARDS (LIKE INGREDIENTS)
     cols = st.columns(3)
 
     for i, item in enumerate(available):
         with cols[i % 3]:
 
             image_path = get_image_path(item["product"])
-            st.image(image_path, width=80)
 
+            # ✅ FULL CARD (IMAGE + TEXT + CHECKBOX INSIDE)
             st.markdown(f"""
-            <div style="padding:12px; border-radius:10px; background:#f5f5f5; margin-bottom:10px;">
+            <div style="
+                padding:15px;
+                border-radius:12px;
+                background:#f5f5f5;
+                margin-bottom:15px;
+                text-align:center;
+                min-height:220px;
+            ">
+                <img src="{image_path}" width="80" style="margin-bottom:10px;" />
+                <br>
                 <b>{item['product']}</b><br>
                 <span style="color:grey;">{item['quantity']}</span><br>
                 <span>💰 ₹{item['price']}</span>

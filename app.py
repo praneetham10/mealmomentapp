@@ -1,6 +1,5 @@
 import streamlit as st
 from core.orchestrator import generate_cart
-import os
 
 st.set_page_config(page_title="Meal Moment", layout="wide")
 
@@ -53,7 +52,7 @@ if dish and (
     st.session_state.last_dish = dish
     st.session_state.result = generate_cart(dish)
 
-# ---------------- MAIN OUTPUT ----------------
+# ---------------- MAIN ----------------
 if st.session_state.result:
 
     result = st.session_state.result
@@ -69,7 +68,7 @@ if st.session_state.result:
         for i, item in enumerate(result["ingredients"]):
             with cols[i % 2]:
                 st.markdown(f"""
-                <div style="padding:10px; border-radius:10px; background:#f5f5f5; margin-bottom:10px;">
+                <div style="padding:12px; border-radius:10px; background:#f5f5f5; margin-bottom:10px;">
                     <b>{item['name']}</b><br>
                     <span style="color:grey;">{item['quantity']}</span>
                 </div>
@@ -104,36 +103,32 @@ if st.session_state.result:
     total = 0
     selected_items = []
 
-    # ✅ FIXED GRID (NO EMPTY BOXES)
-    for i in range(0, len(available), 3):
-        row_items = available[i:i+3]
-        cols = st.columns(len(row_items))
+    # ✅ CART AS CLEAN CARDS (LIKE INGREDIENTS)
+    cols = st.columns(3)
 
-        for col, item in zip(cols, row_items):
-            with col:
+    for i, item in enumerate(available):
+        with cols[i % 3]:
 
-                st.markdown("""
-                <div style="padding:15px; border-radius:15px; background:#ffffff; box-shadow:0px 2px 8px rgba(0,0,0,0.1); text-align:center;">
-                """, unsafe_allow_html=True)
+            image_path = get_image_path(item["product"])
+            st.image(image_path, width=80)
 
-                image_path = get_image_path(item["product"])
-                st.image(image_path, width=100)
+            st.markdown(f"""
+            <div style="padding:12px; border-radius:10px; background:#f5f5f5; margin-bottom:10px;">
+                <b>{item['product']}</b><br>
+                <span style="color:grey;">{item['quantity']}</span><br>
+                <span>💰 ₹{item['price']}</span>
+            </div>
+            """, unsafe_allow_html=True)
 
-                st.markdown(f"**{item['product']}**")
-                st.caption(item["quantity"])
-                st.markdown(f"💰 ₹{item['price']}")
+            checked = st.checkbox(
+                "Add",
+                value=True,
+                key=f"cart_{i}"
+            )
 
-                checked = st.checkbox(
-                    "Add",
-                    value=True,
-                    key=f"cart_{i}_{item['product']}"
-                )
-
-                if checked:
-                    total += item["price"]
-                    selected_items.append(item)
-
-                st.markdown("</div>", unsafe_allow_html=True)
+            if checked:
+                total += item["price"]
+                selected_items.append(item)
 
     # ---------------- UNAVAILABLE ----------------
     if unavailable:

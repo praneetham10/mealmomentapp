@@ -1,5 +1,6 @@
 import streamlit as st
 from core.orchestrator import generate_cart
+import os
 
 st.set_page_config(page_title="Meal Moment", layout="wide")
 
@@ -7,28 +8,33 @@ st.set_page_config(page_title="Meal Moment", layout="wide")
 def get_image_path(product_name):
     name = product_name.lower()
 
-    if "onion" in name:
-        return "assets/onion.png"
-    elif "tomato" in name:
-        return "assets/tomato.png"
-    elif "paneer" in name:
-        return "assets/paneer.png"
-    elif "butter" in name:
-        return "assets/butter.png"
-    elif "milk" in name or "cream" in name:
-        return "assets/milk.png"
-    elif "oil" in name:
-        return "assets/oil.png"
-    elif "spice" in name or "masala" in name:
-        return "assets/spices.png"
-    elif "chili" in name:
-        return "assets/chili.png"
-    elif "turmeric" in name:
-        return "assets/turmeric.png"
-    elif "cashew" in name:
-        return "assets/cashew.png"
+    mapping = {
+        "onion": "assets/onion.png",
+        "tomato": "assets/tomato.png",
+        "paneer": "assets/paneer.png",
+        "butter": "assets/butter.png",
+        "milk": "assets/milk.png",
+        "cream": "assets/milk.png",
+        "oil": "assets/oil.png",
+        "spice": "assets/spices.png",
+        "masala": "assets/spices.png",
+        "chili": "assets/chili.png",
+        "turmeric": "assets/turmeric.png",
+        "cashew": "assets/cashew.png",
+    }
+
+    for key in mapping:
+        if key in name:
+            return mapping[key]
+
+    return "assets/default.png"
+
+# ---------------- SAFE IMAGE LOADER ----------------
+def show_image(path):
+    if os.path.exists(path):
+        st.image(path, width=80)
     else:
-        return "assets/default.png"
+        st.image("https://via.placeholder.com/80", width=80)
 
 # ---------------- HEADER ----------------
 st.markdown("""
@@ -44,7 +50,6 @@ if "result" not in st.session_state:
 if "last_dish" not in st.session_state:
     st.session_state.last_dish = None
 
-# Trigger
 if dish and (
     st.session_state.last_dish != dish
     or st.button("Generate Cart")
@@ -109,19 +114,17 @@ if st.session_state.result:
         with cols[i % 3]:
 
             image_path = get_image_path(item["product"])
+            show_image(image_path)
 
-            # ✅ FULL CARD (IMAGE + TEXT + CHECKBOX INSIDE)
             st.markdown(f"""
             <div style="
-                padding:15px;
+                padding:12px;
                 border-radius:12px;
                 background:#f5f5f5;
-                margin-bottom:15px;
+                margin-bottom:10px;
                 text-align:center;
-                min-height:220px;
+                min-height:140px;
             ">
-                <img src="{image_path}" width="80" style="margin-bottom:10px;" />
-                <br>
                 <b>{item['product']}</b><br>
                 <span style="color:grey;">{item['quantity']}</span><br>
                 <span>💰 ₹{item['price']}</span>

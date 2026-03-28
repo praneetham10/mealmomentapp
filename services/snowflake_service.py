@@ -1,29 +1,32 @@
-import os
 import snowflake.connector
-from dotenv import load_dotenv
-
-load_dotenv()
-
 
 def get_connection():
     return snowflake.connector.connect(
-        user=os.getenv("SNOWFLAKE_USER"),
-        password=os.getenv("SNOWFLAKE_PASSWORD"),
-        account=os.getenv("SNOWFLAKE_ACCOUNT"),
-        warehouse=os.getenv("SNOWFLAKE_WAREHOUSE"),
-        database=os.getenv("SNOWFLAKE_DATABASE"),
-        schema=os.getenv("SNOWFLAKE_SCHEMA")
+        user="YOUR_USERNAME",
+        password="YOUR_PASSWORD",
+        account="YOUR_ACCOUNT_IDENTIFIER",  # e.g. abc-xy12345
+        warehouse="COMPUTE_WH",
+        database="MEAL_APPTEST",
+        schema="PUBLIC"
     )
 
 
-def get_products():
+def fetch_products():
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT NAME, CATEGORY FROM PRODUCTS")
+    cursor.execute("SELECT NAME, PRICE FROM PRODUCTS")
+
     rows = cursor.fetchall()
+
+    products = []
+    for row in rows:
+        products.append({
+            "name": row[0].lower(),
+            "price": row[1]
+        })
 
     cursor.close()
     conn.close()
 
-    return [{"name": r[0], "category": r[1]} for r in rows]
+    return products

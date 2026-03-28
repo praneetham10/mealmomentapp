@@ -2,9 +2,9 @@ import snowflake.connector
 
 def get_connection():
     return snowflake.connector.connect(
-        user="YOUR_USERNAME",
-        password="YOUR_PASSWORD",
-        account="YOUR_ACCOUNT_IDENTIFIER",  # e.g. abc-xy12345
+        user="PRANEETHAM10",
+        password="Stud07y1018##siddu",
+        account="gacgfxs-ou34578",  # e.g. abc-xy12345
         warehouse="COMPUTE_WH",
         database="MEAL_APPTEST",
         schema="PUBLIC"

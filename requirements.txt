@@ -2,3 +2,4 @@ streamlit
 openai
 snowflake-connector-python
 pandas
+snowflake-connector-python

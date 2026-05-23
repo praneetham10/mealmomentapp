@@ -1,16 +1,21 @@
+import os
+from dotenv import load_dotenv
 import snowflake.connector
+
+# Load values from .env file
+load_dotenv()
 
 
 def get_connection():
 
     conn = snowflake.connector.connect(
         user="PRANEETHAM10",
+        password=os.getenv("SNOWFLAKE_TOKEN"),
         account="gacgfxs-ou34578",
         warehouse="COMPUTE_WH",
         database="MEAL_APPTEST",
         schema="PUBLIC",
-        role="ACCOUNTADMIN",
-        authenticator="externalbrowser"
+        role="ACCOUNTADMIN"
     )
 
     return conn

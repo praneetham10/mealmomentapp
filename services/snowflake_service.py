@@ -1,52 +1,21 @@
-import os
-from dotenv import load_dotenv
-import snowflake.connector
-
-# Load variables from .env
-load_dotenv()
-
-
-def get_connection():
-
-    # Debug print (temporary)
-    print("SNOWFLAKE TOKEN:", os.getenv("SNOWFLAKE_TOKEN"))
-
-    conn = snowflake.connector.connect(
-        user="PRANEETHAM10",
-        password=os.getenv("SNOWFLAKE_TOKEN"),
-        account="gacgfxs-ou34578",
-        warehouse="COMPUTE_WH",
-        database="MEAL_APPTEST",
-        schema="PUBLIC",
-        role="ACCOUNTADMIN"
-    )
-
-    return conn
-
-
 def fetch_products():
 
-    conn = get_connection()
-
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        SELECT NAME, PRICE
-        FROM PRODUCTS
-    """)
-
-    rows = cursor.fetchall()
-
-    products = []
-
-    for row in rows:
-
-        products.append({
-            "name": row[0].lower(),
-            "price": row[1]
-        })
-
-    cursor.close()
-    conn.close()
+    products = [
+        {"name": "paneer", "price": 120},
+        {"name": "tomato", "price": 40},
+        {"name": "butter", "price": 60},
+        {"name": "fresh cream", "price": 80},
+        {"name": "onion", "price": 30},
+        {"name": "basmati rice", "price": 150},
+        {"name": "green chili", "price": 20},
+        {"name": "mint leaves", "price": 15},
+        {"name": "biryani masala", "price": 90},
+        {"name": "chicken", "price": 220},
+        {"name": "ginger garlic paste", "price": 55},
+        {"name": "curd", "price": 35},
+        {"name": "coriander leaves", "price": 20},
+        {"name": "capsicum", "price": 45},
+        {"name": "garam masala", "price": 70}
+    ]
 
     return products

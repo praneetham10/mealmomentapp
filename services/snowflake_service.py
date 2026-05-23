@@ -4,15 +4,17 @@ def get_connection():
     return snowflake.connector.connect(
         user="PRANEETHAM10",
         password="Stud07y1018##siddu",
-        account="gacgfxs-ou34578",  # e.g. abc-xy12345
+        account="gacgfxs-ou34578.ap-south-1.aws",
         warehouse="COMPUTE_WH",
         database="MEAL_APPTEST",
-        schema="PUBLIC"
+        schema="PUBLIC",
+        role="ACCOUNTADMIN"
     )
 
 
 def fetch_products():
     conn = get_connection()
+
     cursor = conn.cursor()
 
     cursor.execute("SELECT NAME, PRICE FROM PRODUCTS")
@@ -20,6 +22,7 @@ def fetch_products():
     rows = cursor.fetchall()
 
     products = []
+
     for row in rows:
         products.append({
             "name": row[0].lower(),

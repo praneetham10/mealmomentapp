@@ -4,8 +4,8 @@ import snowflake.connector
 def get_connection():
 
     conn = snowflake.connector.connect(
-        user="YOUR_SNOWFLAKE_USER",
-        account="YOUR_ACCOUNT",
+        user="PRANEETHAM10",
+        account="gacgfxs-ou34578",
         warehouse="COMPUTE_WH",
         database="MEAL_APPTEST",
         schema="PUBLIC",

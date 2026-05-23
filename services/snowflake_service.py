@@ -4,13 +4,12 @@ def get_connection():
     return snowflake.connector.connect(
         user="PRANEETHAM10",
         password="Stud07y1018##siddu",
-        account="gacgfxs-ou34578.ap-south-1.aws",
+        account="gacgfxs-ou34578",
         warehouse="COMPUTE_WH",
         database="MEAL_APPTEST",
         schema="PUBLIC",
         role="ACCOUNTADMIN"
     )
-
 
 def fetch_products():
     conn = get_connection()

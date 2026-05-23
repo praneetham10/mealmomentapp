@@ -2,7 +2,6 @@ import os
 from dotenv import load_dotenv
 import snowflake.connector
 
-# Load values from .env file
 load_dotenv()
 
 

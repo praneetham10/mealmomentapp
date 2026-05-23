@@ -2,10 +2,14 @@ import os
 from dotenv import load_dotenv
 import snowflake.connector
 
+# Load variables from .env
 load_dotenv()
 
 
 def get_connection():
+
+    # Debug print (temporary)
+    print("SNOWFLAKE TOKEN:", os.getenv("SNOWFLAKE_TOKEN"))
 
     conn = snowflake.connector.connect(
         user="PRANEETHAM10",

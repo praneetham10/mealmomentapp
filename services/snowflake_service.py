@@ -3,16 +3,15 @@ import snowflake.connector
 
 
 def get_connection():
-    try:
-        conn = snowflake.connector.connect(
-            user=st.secrets["SNOWFLAKE_USER"],
-            password=st.secrets["SNOWFLAKE_PASSWORD"],
-            account=st.secrets["SNOWFLAKE_ACCOUNT"],
-            warehouse=st.secrets["SNOWFLAKE_WAREHOUSE"],
-            database=st.secrets["SNOWFLAKE_DATABASE"],
-            schema=st.secrets["SNOWFLAKE_SCHEMA"],
-            role=st.secrets["SNOWFLAKE_ROLE"]
-        )
+    conn = snowflake.connector.connect(
+        user=st.secrets["SNOWFLAKE_USER"],
+        account=st.secrets["SNOWFLAKE_ACCOUNT"],
+        warehouse=st.secrets["SNOWFLAKE_WAREHOUSE"],
+        database=st.secrets["SNOWFLAKE_DATABASE"],
+        schema=st.secrets["SNOWFLAKE_SCHEMA"],
+        role=st.secrets["SNOWFLAKE_ROLE"],
+        authenticator="externalbrowser"
+    )
 
         return conn
 

@@ -1,15 +1,25 @@
+import streamlit as st
 import snowflake.connector
 
+
 def get_connection():
-    return snowflake.connector.connect(
-        user="PRANEETHAM10",
-        password="Stud07y1018##siddu",
-        account="gacgfxs-ou34578",
-        warehouse="COMPUTE_WH",
-        database="MEAL_APPTEST",
-        schema="PUBLIC",
-        role="ACCOUNTADMIN"
-    )
+    try:
+        conn = snowflake.connector.connect(
+            user=st.secrets["SNOWFLAKE_USER"],
+            password=st.secrets["SNOWFLAKE_PASSWORD"],
+            account=st.secrets["SNOWFLAKE_ACCOUNT"],
+            warehouse=st.secrets["SNOWFLAKE_WAREHOUSE"],
+            database=st.secrets["SNOWFLAKE_DATABASE"],
+            schema=st.secrets["SNOWFLAKE_SCHEMA"],
+            role=st.secrets["SNOWFLAKE_ROLE"]
+        )
+
+        return conn
+
+    except Exception as e:
+        st.error(f"Snowflake connection failed: {str(e)}")
+        raise
+
 
 def fetch_products():
     conn = get_connection()

@@ -1,13 +1,15 @@
 from services.openai_service import get_completion
 import json
+import re
 
 
 def get_recipe_data(dish):
 
     prompt = f"""
-    Give a recipe for {dish} in JSON format only.
+    Give a recipe for {dish}.
 
-    Format:
+    Return ONLY valid JSON in this format:
+
     {{
         "ingredients": [
             {{
@@ -21,24 +23,28 @@ def get_recipe_data(dish):
         ]
     }}
 
-    Return ONLY valid JSON.
+    Do not include markdown.
+    Do not include explanation.
+    Only return raw JSON.
     """
 
     try:
 
         response = get_completion(prompt)
 
-        print("OPENAI RESPONSE:")
-        print(response)
+        # 🔥 REMOVE ```json blocks if present
+        response = response.strip()
+
+        response = re.sub(r"^```json", "", response)
+        response = re.sub(r"```$", "", response)
+
+        response = response.strip()
 
         recipe = json.loads(response)
 
         return recipe
 
     except Exception as e:
-
-        print("ERROR:")
-        print(str(e))
 
         return {
             "ingredients": [

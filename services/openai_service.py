@@ -5,10 +5,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# 🔥 Try Streamlit secrets first
 api_key = st.secrets.get("OPENAI_API_KEY")
 
-# fallback to local .env
 if not api_key:
     api_key = os.getenv("OPENAI_API_KEY")
 

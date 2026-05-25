@@ -23,7 +23,7 @@ def get_completion(prompt):
         messages=[
             {
                 "role": "system",
-                "content": "You are a helpful cooking assistant."
+                "content": "You are a helpful cooking assistant that ONLY returns valid JSON."
             },
             {
                 "role": "user",

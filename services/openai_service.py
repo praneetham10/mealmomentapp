@@ -1,25 +1,36 @@
 import os
+import streamlit as st
 from openai import OpenAI
+from dotenv import load_dotenv
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+load_dotenv()
+
+# 🔥 Try Streamlit secrets first
+api_key = st.secrets.get("OPENAI_API_KEY")
+
+# fallback to local .env
+if not api_key:
+    api_key = os.getenv("OPENAI_API_KEY")
+
+if not api_key:
+    raise ValueError("OPENAI_API_KEY not set")
+
+client = OpenAI(api_key=api_key)
+
 
 def get_completion(prompt):
+
     response = client.chat.completions.create(
         model="gpt-4.1-mini",
         messages=[
             {
                 "role": "system",
-                "content": """You are a cooking assistant.
-Always respond ONLY in valid JSON format.
-
-Format:
-{
-  "ingredients": [{"name": "", "quantity": ""}],
-  "steps": ["step1", "step2"]
-}
-"""
+                "content": "You are a helpful cooking assistant."
             },
-            {"role": "user", "content": prompt}
+            {
+                "role": "user",
+                "content": prompt
+            }
         ],
         temperature=0.3
     )

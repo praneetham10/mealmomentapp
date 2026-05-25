@@ -2,6 +2,8 @@ import streamlit as st
 from core.orchestrator import generate_cart
 import os
 
+st.write("Secrets loaded:", bool(st.secrets.get("OPENAI_API_KEY")))
+
 st.set_page_config(page_title="Meal Moment", layout="wide")
 
 # ---------------- IMAGE MAPPING ----------------
